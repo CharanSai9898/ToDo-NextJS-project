@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { login } from "@/services/authservice";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {toast} from "react-toastify";
 
@@ -75,6 +76,13 @@ const LoginForm = () => {
         >
           Login
         </button>
+
+        <p className="mt-4 text-center text-sm text-gray-600">
+          No account?{" "}
+          <Link href="/signup" className="font-semibold text-blue-600 hover:underline">
+            Sign up
+          </Link>
+        </p>
       </form>
     </div>
   );
