@@ -4,8 +4,10 @@ import { login } from "@/services/authservice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {toast} from "react-toastify";
+import {Eye,EyeOff} from "lucide-react";
 
 const LoginForm = () => {
+  const[showPassword,setShowPassword] = useState(false);
   const router = useRouter();
   const [form, setForm] = useState({
     email: "",
@@ -61,15 +63,26 @@ const LoginForm = () => {
 
         <div className="mb-6">
           <label className="block mb-2 text-black">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            className="w-full border rounded-lg px-4 py-2 text-black"
-          />
-        </div>
 
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Enter password"
+              className="w-full border rounded-lg px-4 py-2 pr-12 text-black"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+        </div>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
@@ -79,7 +92,10 @@ const LoginForm = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           No account?{" "}
-          <Link href="/signup" className="font-semibold text-blue-600 hover:underline">
+          <Link
+            href="/signup"
+            className="font-semibold text-blue-600 hover:underline"
+          >
             Sign up
           </Link>
         </p>
