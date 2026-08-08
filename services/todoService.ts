@@ -8,7 +8,6 @@ export type TodoPayload = {
   status: string;
 };
 
-// ================= CREATE =================
 
 export const createTodo = async (data: TodoPayload) => {
   return apiFetch(`${BASE_URL}/create`, {
@@ -20,13 +19,9 @@ export const createTodo = async (data: TodoPayload) => {
   });
 };
 
-// ================= GET TODOS =================
-
 export const getTodos = async (page: number = 1, limit: number = 5) => {
   return apiFetch(`${BASE_URL}?page=${page}&limit=${limit}`);
 };
-
-// ================= UPDATE =================
 
 export const updateTodo = async (id: string, data: TodoPayload) => {
   return apiFetch(`${BASE_URL}/${id}`, {
@@ -38,7 +33,6 @@ export const updateTodo = async (id: string, data: TodoPayload) => {
   });
 };
 
-// ================= DELETE =================
 
 export const deleteTodo = async (id: string) => {
   return apiFetch(`${BASE_URL}/${id}`, {
@@ -46,7 +40,6 @@ export const deleteTodo = async (id: string) => {
   });
 };
 
-// ================= SEARCH =================
 
 export const searchTodos = async (
   title: string,

@@ -21,7 +21,7 @@ const Pagination = ({
 
   return (
     <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-      {/* Showing Records */}
+    
       <p className="text-white">
         Showing{" "}
         <span className="font-semibold">
@@ -30,7 +30,7 @@ const Pagination = ({
         of <span className="font-semibold">{totalRecords}</span>
       </p>
 
-      {/* Pagination */}
+
       <div className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(page - 1)}

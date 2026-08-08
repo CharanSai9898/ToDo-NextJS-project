@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { signup } from "@/app/services/authservice";
+import { signup } from "@/services/authservice";
 import { toast } from "react-toastify";
 
 const SignupForm = () => {
@@ -42,28 +42,6 @@ const SignupForm = () => {
 
     
   };
-
-// const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-//   e.preventDefault();
-
-//   console.log("Form Submitted");
-//   console.log(form);
-
-//   try {
-//     const result = await signup(form);
-
-//     console.log("API Response:", result);
-
-//     if (result.success) {
-//       alert("Signup Successful!");
-//     } else {
-//       alert(result.message);
-//     }
-//   } catch (error) {
-//     console.error("Error:", error);
-//     alert("Something went wrong.");
-//   }
-// };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
