@@ -18,7 +18,7 @@ export default function DashBoardPage() {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const [page, setPage] = useState(1);
-  const[loading,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [pagination, setPagination] = useState({
     page: 1,
@@ -43,13 +43,11 @@ export default function DashBoardPage() {
       }
     } catch (error) {
       console.error(error);
-    }
-    finally{
+    } finally {
       setLoading(false);
     }
   };
 
-  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -70,16 +68,21 @@ export default function DashBoardPage() {
     <>
       <h1 className="text-3xl font-bold mb-5">Dashboard</h1>
 
-      <SearchBar search={search} setSearch={setSearch} />
-
       <TodoForm
         onTodoCreated={fetchTodos}
         editingTodo={editingTodo}
         onEditComplete={() => setEditingTodo(null)}
       />
 
-      {loading ? (<Loader />) : (
-      <Todotable todos={todos} onEdit={setEditingTodo} onDelete={fetchTodos}/>
+      <SearchBar search={search} setSearch={setSearch} />
+      {loading ? (
+        <Loader />
+      ) : (
+        <Todotable
+          todos={todos}
+          onEdit={setEditingTodo}
+          onDelete={fetchTodos}
+        />
       )}
       <Pagination
         page={page}
