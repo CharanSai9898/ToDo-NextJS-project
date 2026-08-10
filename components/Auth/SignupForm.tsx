@@ -40,8 +40,6 @@ const SignupForm = () => {
       console.error(error);
       toast.error("Something went wrong.");
     }
-
-    
   };
 
   return (
@@ -99,7 +97,10 @@ const SignupForm = () => {
 
         <p className="mt-4 text-center text-sm text-gray-600">
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-blue-600 hover:underline">
+          <Link
+            href="/login"
+            className="font-semibold text-blue-600 hover:underline"
+          >
             Login
           </Link>
         </p>

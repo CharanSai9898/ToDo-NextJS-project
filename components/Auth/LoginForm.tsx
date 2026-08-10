@@ -1,44 +1,92 @@
 "use client";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import { login } from "@/services/authservice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {toast} from "react-toastify";
-import {Eye,EyeOff} from "lucide-react";
+import { toast } from "react-toastify";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginForm = () => {
-  const[showPassword,setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const router = useRouter();
+
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+
+    if (token) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    setIsCheckingSession(false);
+  }, [router]);
+
+  if (isCheckingSession) {
+    return null;
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((previousForm) => ({
+      ...previousForm,
+      [name]: value,
+    }));
   };
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-   e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-   try {
-     const result = await login(form);
+    const email = form.email.trim();
 
-     console.log(result);
+    if (!email) {
+      toast.error("Email is required");
+      return;
+    }
 
-     if (result.success) {
-      sessionStorage.setItem("token",result.token);
-       toast.success("Login Successful!");
-       router.push("/dashboard");
-     } else {
-       toast.success(result.message);
-     }
-   } catch (error) {
-     console.error(error);
-     toast.success("Something went wrong.");
-   }
- };
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!form.password) {
+      toast.error("Password is required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await login({
+        email,
+        password: form.password,
+      });
+
+      if (result.success) {
+        sessionStorage.setItem("token", result.token);
+
+        if (result.user?.id) {
+          sessionStorage.setItem("userId", result.user.id);
+        }
+
+        toast.success("Login Successful!");
+        router.push("/dashboard");
+      } else {
+        toast.error(result.message || "Login failed");
+      }
+    } catch {
+      toast.error("Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
@@ -55,6 +103,7 @@ const LoginForm = () => {
           <input
             type="email"
             name="email"
+            placeholder="Enter Email"
             value={form.email}
             onChange={handleChange}
             className="w-full border rounded-lg px-4 py-2 text-black"
@@ -83,11 +132,13 @@ const LoginForm = () => {
             </button>
           </div>
         </div>
+
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <p className="mt-4 text-center text-sm text-gray-600">

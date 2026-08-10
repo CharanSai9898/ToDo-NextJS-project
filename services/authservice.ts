@@ -1,16 +1,6 @@
- const BASE_URL = "https://go-assignment-7-production.up.railway.app/todos";
+import type { LoginPayLoad, SignupPayload } from "@/types/todo";
 
-
-type SignupPayload = {
-  name: string;
-  email: string;
-  password: string;
-};
-
-type LoginPayLoad = {
-  email:string;
-  password:string;
-}
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const signup = async (data: SignupPayload) => {
   const response = await fetch(`${BASE_URL}/signup`, {
@@ -24,12 +14,13 @@ export const signup = async (data: SignupPayload) => {
   return response.json();
 };
 
-export const login = async(data:LoginPayLoad) =>{
-  const  response = await fetch (`${BASE_URL}/login`,{
-    method:"POST",
-    headers:{
-      "content-Type":"application/json",
-    },body:JSON.stringify(data),
-  })
+export const login = async (data: LoginPayLoad) => {
+  const response = await fetch(`${BASE_URL}/login`, {
+    method: "POST",
+    headers: {
+      "content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
   return response.json();
-}
+};

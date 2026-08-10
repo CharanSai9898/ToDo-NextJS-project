@@ -1,10 +1,4 @@
-type PaginationProps = {
-  page: number;
-  totalPages: number;
-  totalRecords: number;
-  limit: number;
-  onPageChange: (page: number) => void;
-};
+import type { PaginationProps } from "@/types/todo";
 
 const Pagination = ({
   page,
@@ -19,9 +13,12 @@ const Pagination = ({
 
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 
+  const hasData = totalRecords > 0 && totalPages > 0;
+  const isFirstPage = !hasData || page === 1;
+  const isLastPage = !hasData || page >= totalPages;
+
   return (
     <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-    
       <p className="text-white">
         Showing{" "}
         <span className="font-semibold">
@@ -30,14 +27,13 @@ const Pagination = ({
         of <span className="font-semibold">{totalRecords}</span>
       </p>
 
-
       <div className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(page - 1)}
-          disabled={page === 1}
+          disabled={isFirstPage}
           className={`px-4 py-2 rounded transition
             ${
-              page === 1
+              isFirstPage
                 ? "bg-gray-400 text-white cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}
@@ -62,10 +58,10 @@ const Pagination = ({
 
         <button
           onClick={() => onPageChange(page + 1)}
-          disabled={page === totalPages}
+          disabled={isLastPage}
           className={`px-4 py-2 rounded transition
             ${
-              page === totalPages
+              isLastPage
                 ? "bg-gray-400 text-white cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"
             }`}

@@ -1,10 +1,4 @@
-type ConfirmDialogProps = {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-};
+import type { ConfirmDialogProps } from "@/types/todo";
 
 const ConfirmDialog = ({
   isOpen,

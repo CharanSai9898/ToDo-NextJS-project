@@ -2,38 +2,35 @@
 
 import { useState } from "react";
 import { toast } from "react-toastify";
-
-import type { Todo } from "@/types/todo";
 import { deleteTodo } from "@/services/todoService";
 import ConfirmDialog from "../ConfirmDialog/ConfirmDialog";
-
-type TodoTableProps = {
-  todos: Todo[];
-  onEdit: (todo: Todo) => void;
-  onDelete: () => Promise<void>;
-};
+import type { TodoTableProps } from "@/types/todo";
 
 const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTodoId, setSelectedTodoId] = useState<string | null>(null);
+  const [selectedTodoTitle, setSelectedTodoTitle] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async (id: string) => {
     try {
+      setDeleting(true);
+
       const result = await deleteTodo(id);
 
       if (result.success) {
         toast.success("Todo deleted successfully!");
-
-        await onDelete();
+        onDelete(id);
       } else {
-        toast.info(result.message);
+        toast.error(result.message || "Unable to delete todo");
       }
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Something went wrong.");
     } finally {
+      setDeleting(false);
       setIsDialogOpen(false);
       setSelectedTodoId(null);
+      setSelectedTodoTitle("");
     }
   };
 
@@ -48,7 +45,7 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
               <th className="border p-3">Status</th>
               <th className="border p-3">Created At</th>
               <th className="border p-3">Updated At</th>
-              <th className="border p-3">Created By</th>
+
               <th className="border p-3">Actions</th>
             </tr>
           </thead>
@@ -72,8 +69,6 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
                     : new Date(todo.updatedAt).toLocaleString()}
                 </td>
 
-                <td className="border p-3">{todo.createdById}</td>
-
                 <td className="border p-3">
                   <button
                     className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
@@ -84,8 +79,10 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
 
                   <button
                     className="bg-red-500 text-white px-3 py-1 rounded"
+                    disabled={deleting}
                     onClick={() => {
                       setSelectedTodoId(todo.id);
+                      setSelectedTodoTitle(todo.title);
                       setIsDialogOpen(true);
                     }}
                   >
@@ -101,13 +98,22 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
       <ConfirmDialog
         isOpen={isDialogOpen}
         title="Delete Todo"
-        message="Are you sure you want to delete this todo?"
+        message={
+          <>
+            Are you sure you want to delete{" "}
+            <span className="font-bold text-gray-800">
+              "{selectedTodoTitle}"
+            </span>
+            ?
+          </>
+        }
         onCancel={() => {
           setIsDialogOpen(false);
           setSelectedTodoId(null);
+          setSelectedTodoTitle("");
         }}
         onConfirm={() => {
-          if (selectedTodoId) {
+          if (selectedTodoId && !deleting) {
             handleDelete(selectedTodoId);
           }
         }}

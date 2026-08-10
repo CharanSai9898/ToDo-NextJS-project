@@ -1,13 +1,7 @@
 import apiFetch from "@/services/api";
+import type { TodoPayload } from "@/types/todo";
 
-const BASE_URL = "https://go-assignment-7-production.up.railway.app/todos";
-
-export type TodoPayload = {
-  title: string;
-  description: string;
-  status: string;
-};
-
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const createTodo = async (data: TodoPayload) => {
   return apiFetch(`${BASE_URL}/create`, {
@@ -33,13 +27,11 @@ export const updateTodo = async (id: string, data: TodoPayload) => {
   });
 };
 
-
 export const deleteTodo = async (id: string) => {
   return apiFetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
   });
 };
-
 
 export const searchTodos = async (
   title: string,

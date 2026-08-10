@@ -7,7 +7,6 @@ import Todotable from "@/components/TodoTable/TodoTable";
 import Pagination from "@/components/Pagination/Pagination";
 import { getTodos, searchTodos } from "@/services/todoService";
 import type { Todo } from "@/types/todo";
-import Loader from "@/components/Loader/Loader";
 
 export default function DashBoardPage() {
   const LIMIT = 5;
@@ -18,7 +17,6 @@ export default function DashBoardPage() {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
 
   const [pagination, setPagination] = useState({
     page: 1,
@@ -26,70 +24,146 @@ export default function DashBoardPage() {
     total: 0,
   });
 
-  // Fetch Todos
   const fetchTodos = async () => {
-    setLoading(true);
     try {
-      const result =
-        debouncedSearch.trim() === ""
-          ? await getTodos(page, LIMIT)
-          : await searchTodos(debouncedSearch, page, LIMIT);
+      const trimmedSearch = debouncedSearch.trim();
 
-      if (result.success) {
-        setTodos(result.data);
-        setPagination(result.pagination);
-      } else {
+      const result =
+        trimmedSearch === ""
+          ? await getTodos(page, LIMIT)
+          : await searchTodos(trimmedSearch, page, LIMIT);
+
+      if (!result.success) {
         setTodos([]);
+        return;
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+
+      const data = result.data ?? [];
+      const nextPagination = result.pagination ?? {
+        page,
+        limit: LIMIT,
+        total: data.length,
+      };
+
+      setTodos(data);
+      setPagination(nextPagination);
+
+      const nextTotalPages = Math.ceil(
+        nextPagination.total / nextPagination.limit,
+      );
+
+      if (nextTotalPages === 0 && page !== 1) {
+        setPage(1);
+      } else if (nextTotalPages > 0 && page > nextTotalPages) {
+        setPage(nextTotalPages);
+      }
+    } catch {
+      setTodos([]);
     }
   };
 
   useEffect(() => {
+    const trimmedSearch = search.trim();
+
+    if (trimmedSearch === "") {
+      setDebouncedSearch("");
+      setPage(1);
+      return;
+    }
+
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
+      setDebouncedSearch(trimmedSearch);
       setPage(1);
     }, 500);
 
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Fetch whenever page or debounced search changes
   useEffect(() => {
     fetchTodos();
   }, [page, debouncedSearch]);
 
-  const totalPages = Math.ceil(pagination.total / pagination.limit);
+  const handleTodoCreated = (newTodo: Todo) => {
+    setPagination((previousPagination) => ({
+      ...previousPagination,
+      total: previousPagination.total + 1,
+    }));
+
+    if (page === 1 && debouncedSearch === "") {
+      setTodos((currentTodos) =>
+        [newTodo, ...currentTodos].slice(0, LIMIT),
+      );
+    }
+  };
+
+  const handleTodoUpdated = (updatedTodo: Todo) => {
+    setTodos((currentTodos) =>
+      currentTodos.map((todo) =>
+        todo.id === updatedTodo.id ? updatedTodo : todo,
+      ),
+    );
+  };
+
+  const handleTodoDeleted = (id: string) => {
+    setTodos((currentTodos) => {
+      const updatedTodos = currentTodos.filter(
+        (todo) => todo.id !== id,
+      );
+
+      if (updatedTodos.length === 0 && page > 1) {
+        setPage((previousPage) => previousPage - 1);
+      }
+
+      return updatedTodos;
+    });
+
+    setPagination((previousPagination) => ({
+      ...previousPagination,
+      total: Math.max(0, previousPagination.total - 1),
+    }));
+  };
+
+  const totalPages = Math.ceil(
+    pagination.total / pagination.limit,
+  );
+
+  const handlePageChange = (nextPage: number) => {
+    if (todos.length === 0) {
+      return;
+    }
+
+    if (nextPage < 1 || nextPage > totalPages) {
+      return;
+    }
+
+    setPage(nextPage);
+  };
 
   return (
     <>
       <h1 className="text-3xl font-bold mb-5">Dashboard</h1>
 
       <TodoForm
-        onTodoCreated={fetchTodos}
+        onTodoCreated={handleTodoCreated}
+        onTodoUpdated={handleTodoUpdated}
         editingTodo={editingTodo}
         onEditComplete={() => setEditingTodo(null)}
       />
 
       <SearchBar search={search} setSearch={setSearch} />
-      {loading ? (
-        <Loader />
-      ) : (
-        <Todotable
-          todos={todos}
-          onEdit={setEditingTodo}
-          onDelete={fetchTodos}
-        />
-      )}
+
+      <Todotable
+        todos={todos}
+        onEdit={setEditingTodo}
+        onDelete={handleTodoDeleted}
+      />
+
       <Pagination
         page={page}
         totalPages={totalPages}
         totalRecords={pagination.total}
         limit={LIMIT}
-        onPageChange={setPage}
+        onPageChange={handlePageChange}
       />
     </>
   );
