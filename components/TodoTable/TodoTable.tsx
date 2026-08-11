@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { deleteTodo } from "@/services/todoService";
@@ -64,30 +63,19 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
                 </td>
 
                 <td className="border p-3">
-                  {todo.updatedAt === "0001-01-01T00:00:00Z"
-                    ? "-"
-                    : new Date(todo.updatedAt).toLocaleString()}
-                </td>
+                  {todo.updatedAt === "0001-01-01T00:00:00Z"? "-": new Date(todo.updatedAt).toLocaleString()}</td>
 
                 <td className="border p-3">
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
-                    onClick={() => onEdit(todo)}
-                  >
+                  <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2" onClick={() => onEdit(todo)}>
                     Edit
                   </button>
 
-                  <button
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                    disabled={deleting}
+                  <button className="bg-red-500 text-white px-3 py-1 rounded" disabled={deleting}
                     onClick={() => {
                       setSelectedTodoId(todo.id);
                       setSelectedTodoTitle(todo.title);
                       setIsDialogOpen(true);
-                    }}
-                  >
-                    Delete
-                  </button>
+                    }}>Delete </button>
                 </td>
               </tr>
             ))}
@@ -95,9 +83,7 @@ const Todotable = ({ todos, onEdit, onDelete }: TodoTableProps) => {
         </table>
       </div>
 
-      <ConfirmDialog
-        isOpen={isDialogOpen}
-        title="Delete Todo"
+      <ConfirmDialog isOpen={isDialogOpen} title="Delete Todo"
         message={
           <>
             Are you sure you want to delete{" "}

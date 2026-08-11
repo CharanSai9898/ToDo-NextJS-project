@@ -6,56 +6,29 @@ import type { Todo, TodoPayload } from "@/types/todo";
 import { toast } from "react-toastify";
 import type { TodoFormState, TodoFormProps } from "@/types/todo";
 
-const initialForm: TodoFormState = {
-  title: "",
-  description: "",
-  status: "Pending",
-};
+const initialForm: TodoFormState = { title: "",description: "",status: "Pending",};
 
-const TodoForm = ({
-  onTodoCreated,
-  onTodoUpdated,
-  editingTodo,
-  onEditComplete,
-}: TodoFormProps) => {
+const TodoForm = ({onTodoCreated,onTodoUpdated,editingTodo,onEditComplete,}: TodoFormProps) => {
   const [form, setForm] = useState<TodoFormState>(initialForm);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingTodo) {
-      setForm({
-        title: editingTodo.title,
-        description: editingTodo.description,
-        status: editingTodo.status,
+      setForm({title: editingTodo.title,description: editingTodo.description,status: editingTodo.status,
       });
     } else {
       setForm(initialForm);
     }
   }, [editingTodo]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,) => {
     const { name, value } = e.target;
-
-    setForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
+    setForm((previousForm) => ({...previousForm,[name]: value,}));
   };
 
-  const normalizedForm = {
-    title: form.title.trim(),
-    description: form.description.trim(),
-    status: form.status,
-  };
+  const normalizedForm = { title: form.title.trim(), description: form.description.trim(), status: form.status,};
 
-  const hasChanges = editingTodo
-    ? normalizedForm.title !== editingTodo.title.trim() ||
-      normalizedForm.description !== editingTodo.description.trim() ||
-      normalizedForm.status !== editingTodo.status
+  const hasChanges = editingTodo ? normalizedForm.title !== editingTodo.title.trim() || normalizedForm.description !== editingTodo.description.trim() || normalizedForm.status !== editingTodo.status
     : true;
 
   const handleCreateNewTodo = () => {
@@ -65,7 +38,6 @@ const TodoForm = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const token = sessionStorage.getItem("token");
 
     if (!token) {
@@ -88,17 +60,13 @@ const TodoForm = ({
       return;
     }
 
-    const payload: TodoPayload = {
-      title: normalizedForm.title,
-      description: normalizedForm.description,
-      status: normalizedForm.status,
+    const payload: TodoPayload = {title: normalizedForm.title,description: normalizedForm.description,status: normalizedForm.status,
     };
 
     try {
       setLoading(true);
 
-      const result = editingTodo
-        ? await updateTodo(editingTodo.id, payload)
+      const result = editingTodo ? await updateTodo(editingTodo.id, payload)
         : await createTodo(payload);
 
       if (!result.success) {
@@ -124,51 +92,27 @@ const TodoForm = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6 my-6"
-    >
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6 my-6">
       <h2 className="text-2xl font-bold mb-6 text-black">
         {editingTodo ? "update Todo" : "Add Todo"}
       </h2>
 
       <div className="mb-4">
         <label className="block mb-2 text-black">Title</label>
-
-        <input
-          type="text"
-          name="title"
-          value={form.title}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-4 py-2 text-black"
-          placeholder="Enter title"
-          required
+        <input type="text" name="title" value={form.title} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 text-black" placeholder="Enter title" required
         />
       </div>
 
       <div className="mb-4">
         <label className="block mb-2 text-black">Description</label>
-
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          rows={4}
-          className="w-full border rounded-lg px-4 py-2 text-black"
-          placeholder="Enter description"
+        <textarea name="description" value={form.description} onChange={handleChange} rows={4} className="w-full border rounded-lg px-4 py-2 text-black" placeholder="Enter description"
           required
         />
       </div>
 
       <div className="mb-6">
         <label className="block mb-2 text-black">Status</label>
-
-        <select
-          name="status"
-          value={form.status}
-          onChange={handleChange}
-          className="w-full border rounded-lg px-4 py-2 text-black"
-        >
+        <select name="status" value={form.status} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 text-black">
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
         </select>
@@ -176,28 +120,13 @@ const TodoForm = ({
 
       <div className="flex gap-3">
         {editingTodo && (
-          <button
-            type="button"
-            onClick={handleCreateNewTodo}
-            disabled={loading}
-            className="bg-gray-600 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg"
-          >
+          <button type="button" onClick={handleCreateNewTodo} disabled={loading} className="bg-gray-600 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg">
             Create New Todo
           </button>
         )}
 
-        <button
-          type="submit"
-          disabled={loading || (Boolean(editingTodo) && !hasChanges)}
-          className="bg-blue-600 hover:bg-blue-700 disabled:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg"
-        >
-          {loading
-            ? editingTodo
-              ? "Updating..."
-              : "Adding..."
-            : editingTodo
-              ? "Update Todo"
-              : "Add Todo"}
+        <button type="submit" disabled={loading || (Boolean(editingTodo) && !hasChanges)} className="bg-blue-600 hover:bg-blue-700 disabled:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2 rounded-lg">
+          {loading ? editingTodo ? "Updating..." : "Adding..." : editingTodo ? "Update Todo" : "Add Todo"}
         </button>
       </div>
     </form>
